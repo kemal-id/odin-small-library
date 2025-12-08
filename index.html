@@ -14,11 +14,13 @@
     <form class="book-form" onsubmit="return false">
       <p class="text-type title-form">
         <label for="title">Title</label>
-        <input type="text" name="title" id="title" placeholder="The Hobbit" pattern="^[^<]\w+(?: \w+)*[#&!-@.]*$" required>
+        <input type="text" name="title" id="title" placeholder="The Hobbit" pattern="^[^<]\w+(?: \w+)*[#&!-@.]*$"
+          required>
       </p>
       <p class="text-type author-form">
         <label for="author">Author</label>
-        <input type="text" name="author" id="author" placeholder="J.R.R. Tolkien" pattern="^[^<][a-zA-Z.]+(?: [a-zA-Z.]+){0,3}$" required>
+        <input type="text" name="author" id="author" placeholder="J.R.R. Tolkien"
+          pattern="^[^<][a-zA-Z.]+(?: [a-zA-Z.]+){0,3}$" required>
       </p>
       <p class="pages-form">
         <label for="pages">Total pages</label>
@@ -47,7 +49,7 @@
     <h1>Book List</h1>
     <button class="form-toggle">New Book</button>
     <div class="book-container">
-      <div class="book-card">
+      <!-- <div class="book-card" data-uid="firstBook">
         <img class="book-img" src="" alt="Book cover">
         <div class="book-details">
           <h3 class="book-title">The Hobbit</h3>
@@ -56,8 +58,8 @@
         </div>
         <button class="book-read-status have-read">Have Read</button>
         <button class="book-delete">Delete</button>
-      </div>
-      <div class="book-card">
+      </div> -->
+      <div class="book-card" data-uid="secondBook">
         <img class="book-img" src="" alt="Book cover">
         <div class="book-details">
           <h3 class="book-title">The Upside of stress</h3>
@@ -67,7 +69,7 @@
         <button class="book-read-status have-read">Have Read</button>
         <button class="book-delete">Delete</button>
       </div>
-      <div class="book-card">
+      <!-- <div class="book-card" data-uid="thirdBook">
         <img class="book-img" src="" alt="Book cover">
         <div class="book-details">
           <h3 class="book-title">Ada Apa Dengan Cinta?</h3>
@@ -76,7 +78,7 @@
         </div>
         <button class="book-read-status not-read">Not Read</button>
         <button class="book-delete">Delete</button>
-      </div>
+      </div> -->
     </div>
     </div>
   </main>
