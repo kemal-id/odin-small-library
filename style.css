@@ -1,0 +1,274 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  font-size: 62.5%;
+
+  --dark-text-rgb: 30, 30, 30;
+  --white-text-rgb: 245, 245, 245;
+  --blue-rgb: 20, 160, 225;
+}
+
+body {
+  font-size: 1.6rem;
+  color: rgb(var(--dark-text-rgb));
+  background-color: rgb(var(--white-text-rgb), 0.5);
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+/* 
+
+
+form section 
+
+
+*/
+
+.form-section {
+  height: 25rem;
+  /* padding: 5rem 0; */
+  border: 1px solid tan;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba(var(--blue-rgb), 0.4);
+}
+
+form {
+  display: grid;
+  grid-template-columns: 32rem 16rem;
+  grid-template-rows: 8rem 8rem 4rem;
+  grid-template-areas:
+    "title pages"
+    "author read"
+    "button button";
+  gap: 1rem;
+  /* place-content: center; */
+  font-size: 1.8rem;
+}
+
+form > p {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.title-form {
+  grid-area: title;
+}
+
+.author-form {
+  grid-area: author;
+}
+
+.pages-form {
+  grid-area: pages;
+  /* flex-direction: row;
+  gap: 1rem;
+  align-items: flex-end;
+  justify-content: start; */
+}
+
+.read-status-form {
+  grid-area: read;
+}
+
+p > label,
+legend {
+  /* padding-left: 0.3ch; */
+  line-height: 1.5;
+}
+
+input[type="text"],
+input[type="number"] {
+  font-size: 1.6rem;
+  height: 3.2ch;
+  padding: 0 1ch;
+  border: 1px solid rgb(var(--dark-text-rgb), 0.5);
+  border-radius: 0.3ch;
+  line-height: 1.5;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+  outline: 2px solid rgb(var(--dark-text-rgb), 0.8);
+  border: none;
+}
+
+input[type="text"]:user-invalid,
+input[type="number"]:user-invalid {
+  outline: 1px solid red;
+}
+
+input[type="text"]::placeholder {
+  opacity: 0.5;
+}
+
+input[type="number"] {
+  width: 8ch;
+  margin-left: 2rem;
+  /* display: flex; */
+  /* align-self: flex-end; */
+}
+
+.read-status-form {
+  position: relative;
+  border: none;
+  display: flex;
+  align-items: center;
+  padding-top: 2.8rem;
+}
+
+legend {
+  position: absolute;
+  top: 1.4rem;
+}
+
+.read-status-form ul {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  height: 3ch;
+  padding-left: 2rem;
+}
+
+.read-status-form li {
+  list-style: none;
+}
+
+.button-container {
+  grid-area: button;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.button-container > button {
+  padding: 1rem 4em;
+
+  background-color: rgb(var(--dark-text-rgb), 0);
+  border: 1px solid rgb(var(--dark-text-rgb), 0.3);
+  border-radius: 5px;
+}
+
+.button-container > button:hover,
+.button-container > button:focus {
+  background-color: rgb(var(--dark-text-rgb), 0.4);
+  color: #fafafa;
+  border: none;
+}
+
+.button-container > button:active {
+  transform: scale(0.98);
+}
+
+/* 
+
+
+main section 
+
+
+*/
+
+main {
+  padding: 1rem;
+  position: relative;
+}
+
+main > button {
+  position: absolute;
+  right: 5rem;
+  top: 1rem;
+
+  padding: 1em 2.5em;
+  background-color: #fafafa;
+  border: 1px solid rgba(var(--blue-rgb), 0.9);
+  border-radius: 0.8rem;
+}
+
+main > button:hover,
+main > button:focus {
+  background-color: rgb(var(--blue-rgb), 0.9);
+  color: rgb(var(--white-text-rgb));
+  border: none;
+}
+
+.book-container {
+  margin-top: 3.2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+  gap: 1.6rem;
+}
+
+.book-card {
+  height: 15rem;
+  padding: 0.5rem;
+  border: 1px solid rgb(var(--dark-text-rgb), 0.3);
+  border-radius: 0.8rem;
+  box-shadow: 2px 2px 3px 1px rgb(var(--dark-text-rgb), 0.1);
+  background-color: #fefefe;
+
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: 3fr 1fr;
+  grid-template-areas:
+    "img detail"
+    "read button";
+
+  --red-rgb: 150, 10, 10;
+  --teal: teal;
+}
+
+.book-details {
+  padding-right: 1rem;
+}
+
+.book-author,
+.book-pages {
+  opacity: 0.8;
+}
+
+.book-read-status {
+  grid-area: read;
+  place-self: center;
+  background-color: rgb(var(--white-text-rgb), 0);
+  border: 1px solid rgb(var(--white-text-rgb), 0);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.have-read {
+  color: var(--teal);
+}
+
+.have-read:hover,
+.have-read:focus {
+  border-color: rgb(var(--teal), 0.8);
+}
+
+.not-read {
+  color: rgba(var(--red-rgb));
+}
+
+.not-read:hover,
+.not-read:focus {
+  border-color: rgba(var(--red-rgb));
+}
+
+
+.book-delete {
+  padding: 0.5em 1.5em;
+  margin-right: 0.5rem;
+  place-self: center end;
+  background-color: rgba(var(--red-rgb), 0.7);
+  border: 1px solid red;
+  border-radius: 5px;
+  color: rgb(var(--white-text-rgb));
+}
