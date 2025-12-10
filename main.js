@@ -1,3 +1,6 @@
+const ADD = "ADD";
+const DEL = "DEL";
+
 function Book(metadata) {
   (this.title = metadata.title),
     (this.author = metadata.author),
@@ -5,10 +8,6 @@ function Book(metadata) {
     (this.read = parseInt(metadata["read-status"]) == 1 ? true : false),
     (this.uid = crypto.randomUUID());
 }
-
-Book.prototype.getUID = function () {
-  return this.uid;
-};
 
 const templateBooks = [
   {
@@ -29,9 +28,15 @@ const templateBooks = [
     pages: 532,
     "read-status": 0,
   },
+  {
+    title: "Harry Potter",
+    author: "Forgot",
+    pages: 8756,
+    "read-status": 0
+  }
 ];
 
-const books = []
+const books = [];
 
 const bookContainer = document.querySelector(".book-container");
 const bookForm = document.querySelector(".book-form");
@@ -74,26 +79,9 @@ function makeDeleteButton() {
   return delButton;
 }
 
-// function checkListedBooks(uid) {
-//   const bookList = [...books];
-//   console.log(bookList);
-//   console.log(uid);
-//   let listed = false;
-
-//   for (let i = 0; i < bookList.length; i++) {
-//     if (bookList[i].uid == uid) {
-//       listed = true;
-//       break;
-//     }
-//   }
-
-//   return listed;
-// }
-
 templateBooks.forEach((dbook) => {
   const book = new Book(dbook);
   books.push(book);
-  // console.log(book);
   updateAddDisplay();
 });
 
@@ -113,7 +101,6 @@ function formSubmitHandler(e) {
 function readStatusChangeHandler(e) {
   e.preventDefault();
   let classList = e.target.classList;
-  // console.log(e.target.classList);
   if (classList.contains("have-read")) {
     classList.replace("have-read", "not-read");
     e.target.innerText = "Not Read";
@@ -127,8 +114,17 @@ function delButtonHandler(e) {
   const parentNodeUID = e.target.parentNode.dataset.uid;
   console.log(e.target.parentNode.dataset.uid);
   console.log(books);
-  const arr = books.filter(book => book.uid != parentNodeUID);
-  console.log(arr);
+  let index = NaN;
+  for (let i = 0; i < books.length; i++) {
+    if (books[i].uid == parentNodeUID) {
+      console.log(i);
+      books.splice(i, 1);
+      index = i;
+      break;
+    }
+  }
+  console.log(books);
+  updateDelDisplay();
 }
 
 function getNodesUID() {
@@ -137,7 +133,6 @@ function getNodesUID() {
   bookNodes.forEach((node) => {
     nodesUID.push(node.dataset.uid);
   });
-  // console.log(nodesUID);
   return nodesUID;
 }
 
@@ -149,7 +144,6 @@ function addBookToArray(data) {
 function updateAddDisplay() {
   const bookList = [...books];
   const displayedNodes = getNodesUID();
-  // console.log(displayedNodes);
   bookList.forEach((book) => {
     if (!displayedNodes.includes(book.uid)) {
       const bookElement = makeBookCard(book);
@@ -161,14 +155,15 @@ function updateAddDisplay() {
 function updateDelDisplay() {
   const bookList = [...books];
   const booksUID = [];
-  bookList.forEach(book => booksUID.push(book.uid));
-  const displayedNodes = getNodesUID();
-  displayedNodes.forEach(node => {
-    if(!booksUID.includes(node)) {
-      const el = document.querySelector(`[data-uid]=${node}`);
-      el.parentNode.removeChild(el);
-    }
-  })
-}
+  bookList.forEach((book) => booksUID.push(book.uid));
+  let bookNodes = document.querySelectorAll(".book-card");
+  console.log(bookNodes);
 
-// console.log(document.querySelectorAll(".book-card"));
+  for (let i = 0; i < bookNodes.length; i++) {
+    let index = booksUID.indexOf(bookNodes[i].dataset.uid);
+    console.log(index);
+    if (index == -1) {
+      bookNodes[i].remove();
+    }
+  }
+}
