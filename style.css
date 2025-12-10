@@ -40,7 +40,6 @@ form section
   align-items: center;
 
   background-color: rgba(var(--blue-rgb), 0.4);
- */
 }
 
 .is-hidden {
@@ -56,7 +55,6 @@ form {
     "author read"
     "button button";
   gap: 1rem;
-  /* place-content: center; */
   font-size: 1.8rem;
 }
 

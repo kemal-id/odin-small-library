@@ -24,8 +24,8 @@ const templateBooks = [
     title: "Harry Potter",
     author: "Forgot",
     pages: 8756,
-    "read-status": 0
-  }
+    "read-status": 0,
+  },
 ];
 
 function Book(metadata) {
@@ -41,6 +41,12 @@ const books = [];
 const bookContainer = document.querySelector(".book-container");
 const bookForm = document.querySelector(".book-form");
 
+templateBooks.forEach((dbook) => {
+  const book = new Book(dbook);
+  books.push(book);
+  updateDisplay(ADD);
+});
+
 bookForm.addEventListener("submit", formSubmitHandler);
 
 function formSubmitHandler(e) {
@@ -53,32 +59,32 @@ function formSubmitHandler(e) {
   }
 
   addBookToArray(metadata);
-  updateAddDisplay();
+  updateDisplay(ADD);
 }
 
-function updateAddDisplay() {
+function updateDisplay(action) {
   const bookList = [...books];
-  const displayedNodes = getNodesUID();
-  bookList.forEach((book) => {
-    if (!displayedNodes.includes(book.uid)) {
-      const bookElement = makeBookCard(book);
-      bookContainer.appendChild(bookElement);
-    }
-  });
-}
+  if (action === ADD) {
+    const displayedNodes = getNodesUID();
+    bookList.forEach((book) => {
+      if (!displayedNodes.includes(book.uid)) {
+        const bookElement = makeBookCard(book);
+        bookContainer.appendChild(bookElement);
+      }
+    });
+  } else if (action === DEL) {
+    const booksUID = [];
+    bookList.forEach((book) => booksUID.push(book.uid));
+    let bookNodes = document.querySelectorAll(".book-card");
+    console.log(bookNodes);
 
-function updateDelDisplay() {
-  const bookList = [...books];
-  const booksUID = [];
-  bookList.forEach((book) => booksUID.push(book.uid));
-  let bookNodes = document.querySelectorAll(".book-card");
-  console.log(bookNodes);
-
-  for (let i = 0; i < bookNodes.length; i++) {
-    let index = booksUID.indexOf(bookNodes[i].dataset.uid);
-    console.log(index);
-    if (index == -1) {
-      bookNodes[i].remove();
+    for (let i = 0; i < bookNodes.length; i++) {
+      let index = booksUID.indexOf(bookNodes[i].dataset.uid);
+      console.log(index);
+      if (index == -1) {
+        bookNodes[i].remove();
+        break;
+      }
     }
   }
 }
@@ -119,12 +125,6 @@ function makeDeleteButton() {
   return delButton;
 }
 
-templateBooks.forEach((dbook) => {
-  const book = new Book(dbook);
-  books.push(book);
-  updateAddDisplay();
-});
-
 
 
 function readStatusChangeHandler(e) {
@@ -153,7 +153,7 @@ function delButtonHandler(e) {
     }
   }
   console.log(books);
-  updateDelDisplay();
+  updateDisplay(DEL);
 }
 
 function getNodesUID() {
@@ -170,14 +170,12 @@ function addBookToArray(data) {
   books.push(book);
 }
 
-
-
 const newBookButton = document.querySelector(".form-toggle");
 newBookButton.addEventListener("click", formToggleHandler);
 
 function formToggleHandler(e) {
   const formSection = document.querySelector(".form-section");
-  if(formSection.classList.contains("is-hidden")) {
+  if (formSection.classList.contains("is-hidden")) {
     formSection.classList.remove("is-hidden");
   } else {
     formSection.classList.add("is-hidden");
