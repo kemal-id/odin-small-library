@@ -1,14 +1,6 @@
 const ADD = "ADD";
 const DEL = "DEL";
 
-function Book(metadata) {
-  (this.title = metadata.title),
-    (this.author = metadata.author),
-    (this.pages = metadata.pages),
-    (this.read = parseInt(metadata["read-status"]) == 1 ? true : false),
-    (this.uid = crypto.randomUUID());
-}
-
 const templateBooks = [
   {
     title: "The Hobbit",
@@ -36,12 +28,60 @@ const templateBooks = [
   }
 ];
 
+function Book(metadata) {
+  (this.title = metadata.title),
+    (this.author = metadata.author),
+    (this.pages = metadata.pages),
+    (this.read = parseInt(metadata["read-status"]) == 1 ? true : false),
+    (this.uid = crypto.randomUUID());
+}
+
 const books = [];
 
 const bookContainer = document.querySelector(".book-container");
 const bookForm = document.querySelector(".book-form");
 
 bookForm.addEventListener("submit", formSubmitHandler);
+
+function formSubmitHandler(e) {
+  e.preventDefault();
+
+  let metadata = {};
+  let data = new FormData(bookForm);
+  for (const entry of data) {
+    metadata[`${entry[0]}`] = entry[1].trim();
+  }
+
+  addBookToArray(metadata);
+  updateAddDisplay();
+}
+
+function updateAddDisplay() {
+  const bookList = [...books];
+  const displayedNodes = getNodesUID();
+  bookList.forEach((book) => {
+    if (!displayedNodes.includes(book.uid)) {
+      const bookElement = makeBookCard(book);
+      bookContainer.appendChild(bookElement);
+    }
+  });
+}
+
+function updateDelDisplay() {
+  const bookList = [...books];
+  const booksUID = [];
+  bookList.forEach((book) => booksUID.push(book.uid));
+  let bookNodes = document.querySelectorAll(".book-card");
+  console.log(bookNodes);
+
+  for (let i = 0; i < bookNodes.length; i++) {
+    let index = booksUID.indexOf(bookNodes[i].dataset.uid);
+    console.log(index);
+    if (index == -1) {
+      bookNodes[i].remove();
+    }
+  }
+}
 
 function makeBookCard(book) {
   const bookCard = document.createElement("div");
@@ -85,18 +125,7 @@ templateBooks.forEach((dbook) => {
   updateAddDisplay();
 });
 
-function formSubmitHandler(e) {
-  e.preventDefault();
 
-  let metadata = {};
-  let data = new FormData(bookForm);
-  for (const entry of data) {
-    metadata[`${entry[0]}`] = entry[1].trim();
-  }
-
-  addBookToArray(metadata);
-  updateAddDisplay();
-}
 
 function readStatusChangeHandler(e) {
   e.preventDefault();
@@ -141,29 +170,16 @@ function addBookToArray(data) {
   books.push(book);
 }
 
-function updateAddDisplay() {
-  const bookList = [...books];
-  const displayedNodes = getNodesUID();
-  bookList.forEach((book) => {
-    if (!displayedNodes.includes(book.uid)) {
-      const bookElement = makeBookCard(book);
-      bookContainer.appendChild(bookElement);
-    }
-  });
-}
 
-function updateDelDisplay() {
-  const bookList = [...books];
-  const booksUID = [];
-  bookList.forEach((book) => booksUID.push(book.uid));
-  let bookNodes = document.querySelectorAll(".book-card");
-  console.log(bookNodes);
 
-  for (let i = 0; i < bookNodes.length; i++) {
-    let index = booksUID.indexOf(bookNodes[i].dataset.uid);
-    console.log(index);
-    if (index == -1) {
-      bookNodes[i].remove();
-    }
+const newBookButton = document.querySelector(".form-toggle");
+newBookButton.addEventListener("click", formToggleHandler);
+
+function formToggleHandler(e) {
+  const formSection = document.querySelector(".form-section");
+  if(formSection.classList.contains("is-hidden")) {
+    formSection.classList.remove("is-hidden");
+  } else {
+    formSection.classList.add("is-hidden");
   }
 }

@@ -30,15 +30,21 @@ form section
 
 */
 
+
+
 .form-section {
   height: 25rem;
-  /* padding: 5rem 0; */
   border: 1px solid tan;
   display: flex;
   justify-content: center;
   align-items: center;
 
   background-color: rgba(var(--blue-rgb), 0.4);
+ */
+}
+
+.is-hidden {
+  display: none;
 }
 
 form {
@@ -70,10 +76,6 @@ form > p {
 
 .pages-form {
   grid-area: pages;
-  /* flex-direction: row;
-  gap: 1rem;
-  align-items: flex-end;
-  justify-content: start; */
 }
 
 .read-status-form {
@@ -82,7 +84,6 @@ form > p {
 
 p > label,
 legend {
-  /* padding-left: 0.3ch; */
   line-height: 1.5;
 }
 
@@ -114,8 +115,6 @@ input[type="text"]::placeholder {
 input[type="number"] {
   width: 8ch;
   margin-left: 2rem;
-  /* display: flex; */
-  /* align-self: flex-end; */
 }
 
 .read-status-form {
