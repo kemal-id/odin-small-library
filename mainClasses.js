@@ -28,22 +28,13 @@ class PubSub {
     }
     this.#events[event].forEach((callback) => callback(data));
   };
-
-  getEvents = () => {
-    return this.#events;
-  };
 }
 
 const ps = new PubSub();
 
 //domHandler
 (function () {
-  const add = "add";
-  const del = "del";
-
   const bookContainer = document.querySelector(".book-container");
-  const bookNodes = document.querySelectorAll(".book-card");
-  const formSection = document.querySelector(".form-section");
   const bookForm = document.querySelector(".book-form");
   const newBookButton = document.querySelector(".form-toggle");
 
@@ -59,9 +50,7 @@ const ps = new PubSub();
       metadata[`${entry[0]}`] = entry[1].trim();
     }
 
-    // addBookToArray(metadata);
     ps.publish("addBookToArray", metadata);
-    // ps.publish();
   }
 
   function makeBookCard(book) {
@@ -85,7 +74,6 @@ const ps = new PubSub();
     e.preventDefault();
     let classList = e.target.classList;
     let nodeUid = e.target.parentNode.dataset.uid;
-    // console.log(nodeUid);
     if (classList.contains("have-read")) {
       classList.replace("have-read", "not-read");
       e.target.innerText = "Not Read";
@@ -109,10 +97,6 @@ const ps = new PubSub();
 
   function delButtonHandler(e) {
     const parentNodeUID = e.target.parentNode.dataset.uid;
-    // console.log(e.target.parentNode.dataset.uid);
-    // // console.log(books);
-    // let index = NaN;
-
     ps.publish("delBookInArray", parentNodeUID);
   }
 
@@ -134,17 +118,20 @@ const ps = new PubSub();
     return nodesUID;
   }
 
-  function formToggleHandler(e) {
+  function formToggleHandler() {
     const formSection = document.querySelector(".form-section");
     if (formSection.classList.contains("is-hidden")) {
       formSection.classList.remove("is-hidden");
+      newBookButton.innerText = "Hide Form";
     } else {
       formSection.classList.add("is-hidden");
+      newBookButton.innerText = "Add New Book";
     }
   }
 
   function updateDisplay([books, action]) {
-    console.log("fires update");
+    const add = "add";
+    const del = "del";
     const bookList = [...books];
     if (action === add) {
       const displayedNodes = getNodesUID();
@@ -158,11 +145,9 @@ const ps = new PubSub();
       const booksUID = [];
       bookList.forEach((book) => booksUID.push(book.uid));
       let bookNodes = document.querySelectorAll(".book-card");
-      // console.log(bookNodes);
 
       for (let i = 0; i < bookNodes.length; i++) {
         let index = booksUID.indexOf(bookNodes[i].dataset.uid);
-        // console.log(index);
         if (index == -1) {
           bookNodes[i].remove();
           break;
@@ -206,13 +191,8 @@ const ps = new PubSub();
   ];
 
   templateBooks.forEach((tbook) => {
-    const book = new Book(tbook);
-    books.push(book);
+    addBookToArray(tbook);
   });
-
-  console.log(books);
-
-  ps.publish("updateBookDisplay", [books, "add"]);
 
   function addBookToArray(data) {
     const book = new Book(data);
