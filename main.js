@@ -36,7 +36,7 @@ function Book(metadata) {
     (this.uid = crypto.randomUUID());
 }
 
-const books = [];
+// const books = [];
 
 const bookContainer = document.querySelector(".book-container");
 const bookForm = document.querySelector(".book-form");

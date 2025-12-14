@@ -1,14 +1,12 @@
 class Book {
   constructor(metadata) {
-    title = metadata.title;
-    author = metadata.author;
-    pages = metadata.pages;
-    read = parseInt(metadata["read-status"]) == 1 ? true : false;
-    uid = crypto.randomUUID();
+    this.title = metadata.title;
+    this.author = metadata.author;
+    this.pages = metadata.pages;
+    this.read = parseInt(metadata["read-status"]) == 1 ? true : false;
+    this.uid = crypto.randomUUID();
   }
 }
-
-class DomHandler {}
 
 class PubSub {
   events = {};
@@ -24,18 +22,172 @@ class PubSub {
   };
 
   publish = (event, data) => {
-    if (!this.events[event]) return;
-    this.events[event].forEach(callback => callback(data));
+    if (!this.events[event]) {
+      console.log("Haven't seen the event");
+      return;
+    }
+    this.events[event].forEach((callback) => callback(data));
   };
 
   getEvents = () => {
     return this.events;
-  }
+  };
 }
 
-//top-level function
+const ps = new PubSub();
+
+
+//domHandler
 (function () {
-  const books = [
+  const add = "add";
+  const del = "del";
+
+  const bookContainer = document.querySelector(".book-container");
+  const bookNodes = document.querySelectorAll(".book-card");
+  const formSection = document.querySelector(".form-section");
+  const bookForm = document.querySelector(".book-form");
+  const newBookButton = document.querySelector(".form-toggle");
+
+  newBookButton.addEventListener("click", formToggleHandler);
+  bookForm.addEventListener("submit", formSubmitHandler);
+
+  function formSubmitHandler(e) {
+    e.preventDefault();
+
+    let metadata = {};
+    let data = new FormData(bookForm);
+    for (const entry of data) {
+      metadata[`${entry[0]}`] = entry[1].trim();
+    }
+
+    // addBookToArray(metadata);
+    ps.publish("addBookToArray", metadata);
+    // ps.publish();
+  }
+
+  function makeBookCard(book) {
+    const bookCard = document.createElement("div");
+    bookCard.classList.add("book-card");
+    bookCard.setAttribute("data-uid", book.uid);
+    bookCard.innerHTML = `
+          <img class="book-img" src="" alt="${book.title} cover">
+          <div class="book-details">
+            <h3 class="book-title">${book.title}</h3>
+            <p class="book-author">by ${book.author}</p>
+            <p class="book-pages">${book.pages ? book.pages + " pages" : ""}</p>
+          </div>`;
+    bookCard.appendChild(makeReadStatusButton(book.read));
+    bookCard.appendChild(makeDeleteButton());
+
+    return bookCard;
+  }
+
+  function readStatusChangeHandler(e) {
+    e.preventDefault();
+    let classList = e.target.classList;
+    let nodeUid = e.target.parentNode.dataset.uid;
+    // console.log(nodeUid);
+    if (classList.contains("have-read")) {
+      classList.replace("have-read", "not-read");
+      e.target.innerText = "Not Read";
+    } else {
+      classList.replace("not-read", "have-read");
+      e.target.innerText = "Have Read";
+    }
+
+    ps.publish("changedReadStatus", [nodeUid, e.target.innerText] );
+  }
+
+  function makeReadStatusButton(readStatus) {
+    const readStatusButton = document.createElement("button");
+    readStatusButton.classList.add("book-read-status");
+    readStatusButton.classList.add(readStatus ? "have-read" : "not-read");
+    readStatusButton.innerText = readStatus ? "Have Read" : "Not Read";
+    readStatusButton.addEventListener("click", readStatusChangeHandler);
+
+    return readStatusButton;
+  }
+
+  function delButtonHandler(e) {
+    const parentNodeUID = e.target.parentNode.dataset.uid;
+    console.log(e.target.parentNode.dataset.uid);
+    console.log(books);
+    let index = NaN;
+    for (let i = 0; i < books.length; i++) {
+      if (books[i].uid == parentNodeUID) {
+        console.log(i);
+        books.splice(i, 1);
+        index = i;
+        break;
+      }
+    }
+    console.log(books);
+    updateDisplay(DEL);
+  }
+
+  function makeDeleteButton() {
+    const delButton = document.createElement("button");
+    delButton.classList.add("book-delete");
+    delButton.innerText = "Delete";
+    delButton.addEventListener("click", delButtonHandler);
+
+    return delButton;
+  }
+
+  function getNodesUID() {
+    const bookNodes = document.querySelectorAll(".book-card");
+    const nodesUID = [];
+    bookNodes.forEach((node) => {
+      nodesUID.push(node.dataset.uid);
+    });
+    return nodesUID;
+  }
+
+  function formToggleHandler(e) {
+    const formSection = document.querySelector(".form-section");
+    if (formSection.classList.contains("is-hidden")) {
+      formSection.classList.remove("is-hidden");
+    } else {
+      formSection.classList.add("is-hidden");
+    }
+  }
+
+  function updateDisplay([books, action]) {
+    console.log("fires update");
+    const bookList = [...books];
+    if (action === add) {
+      const displayedNodes = getNodesUID();
+      bookList.forEach((book) => {
+        if (!displayedNodes.includes(book.uid)) {
+          const bookElement = makeBookCard(book);
+          bookContainer.appendChild(bookElement);
+        }
+      });
+    } else if (action === del) {
+      const booksUID = [];
+      bookList.forEach((book) => booksUID.push(book.uid));
+      let bookNodes = document.querySelectorAll(".book-card");
+      console.log(bookNodes);
+
+      for (let i = 0; i < bookNodes.length; i++) {
+        let index = booksUID.indexOf(bookNodes[i].dataset.uid);
+        console.log(index);
+        if (index == -1) {
+          bookNodes[i].remove();
+          break;
+        }
+      }
+    }
+  }
+
+  ps.subs("updateBookDisplay", updateDisplay);
+})();
+
+//main function
+(function () {
+  const books = [];
+
+  const templateBooks = [
     {
       title: "The Hobbit",
       author: "J.R.R. Tolkien",
@@ -61,4 +213,33 @@ class PubSub {
       "read-status": 0,
     },
   ];
+
+  templateBooks.forEach((tbook) => {
+    const book = new Book(tbook);
+    books.push(book);
+  });
+
+  console.log(books);
+
+  ps.publish("updateBookDisplay", [books, "add"]);
+
+  function addBookToArray(data) {
+    const book = new Book(data);
+    books.push(book);
+    ps.publish("updateBookDisplay", [books, "add"]);
+  }
+
+  function changeReadStatus([id, status]) {
+    books.forEach(book => {
+      if(book.uid == id) {
+        let read = "Have Read";
+        // let notRead = "Not Read";
+        status == read ? book.read = true : book.read = false;
+        console.log(book.title, book.read);
+      }
+    })
+  }
+
+  ps.subs("addBookToArray", addBookToArray);
+  ps.subs("changedReadStatus", changeReadStatus);
 })();
