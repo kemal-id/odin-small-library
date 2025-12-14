@@ -9,33 +9,32 @@ class Book {
 }
 
 class PubSub {
-  events = {};
+  #events = {};
 
   subs = (event, callback) => {
-    if (!this.events[event]) this.events[event] = [];
-    this.events[event].push(callback);
+    if (!this.#events[event]) this.#events[event] = [];
+    this.#events[event].push(callback);
   };
 
   unsubs = (event, callback) => {
-    if (!this.events[event]) return;
-    this.events[event] = this.events[event].filter((fn) => fn != callback);
+    if (!this.#events[event]) return;
+    this.#events[event] = this.events[event].filter((fn) => fn != callback);
   };
 
   publish = (event, data) => {
-    if (!this.events[event]) {
+    if (!this.#events[event]) {
       console.log("Haven't seen the event");
       return;
     }
-    this.events[event].forEach((callback) => callback(data));
+    this.#events[event].forEach((callback) => callback(data));
   };
 
   getEvents = () => {
-    return this.events;
+    return this.#events;
   };
 }
 
 const ps = new PubSub();
-
 
 //domHandler
 (function () {
@@ -95,7 +94,7 @@ const ps = new PubSub();
       e.target.innerText = "Have Read";
     }
 
-    ps.publish("changedReadStatus", [nodeUid, e.target.innerText] );
+    ps.publish("changedReadStatus", [nodeUid, e.target.innerText]);
   }
 
   function makeReadStatusButton(readStatus) {
@@ -110,19 +109,11 @@ const ps = new PubSub();
 
   function delButtonHandler(e) {
     const parentNodeUID = e.target.parentNode.dataset.uid;
-    console.log(e.target.parentNode.dataset.uid);
-    console.log(books);
-    let index = NaN;
-    for (let i = 0; i < books.length; i++) {
-      if (books[i].uid == parentNodeUID) {
-        console.log(i);
-        books.splice(i, 1);
-        index = i;
-        break;
-      }
-    }
-    console.log(books);
-    updateDisplay(DEL);
+    // console.log(e.target.parentNode.dataset.uid);
+    // // console.log(books);
+    // let index = NaN;
+
+    ps.publish("delBookInArray", parentNodeUID);
   }
 
   function makeDeleteButton() {
@@ -167,11 +158,11 @@ const ps = new PubSub();
       const booksUID = [];
       bookList.forEach((book) => booksUID.push(book.uid));
       let bookNodes = document.querySelectorAll(".book-card");
-      console.log(bookNodes);
+      // console.log(bookNodes);
 
       for (let i = 0; i < bookNodes.length; i++) {
         let index = booksUID.indexOf(bookNodes[i].dataset.uid);
-        console.log(index);
+        // console.log(index);
         if (index == -1) {
           bookNodes[i].remove();
           break;
@@ -229,17 +220,26 @@ const ps = new PubSub();
     ps.publish("updateBookDisplay", [books, "add"]);
   }
 
-  function changeReadStatus([id, status]) {
-    books.forEach(book => {
-      if(book.uid == id) {
-        let read = "Have Read";
-        // let notRead = "Not Read";
-        status == read ? book.read = true : book.read = false;
-        console.log(book.title, book.read);
+  function delBookInArray(bookUid) {
+    for (let i = 0; i < books.length; i++) {
+      if (books[i].uid == bookUid) {
+        books.splice(i, 1);
+        ps.publish("updateBookDisplay", [books, "del"]);
+        break;
       }
-    })
+    }
+  }
+
+  function changeReadStatus([id, status]) {
+    books.forEach((book) => {
+      if (book.uid == id) {
+        let read = "Have Read";
+        status == read ? (book.read = true) : (book.read = false);
+      }
+    });
   }
 
   ps.subs("addBookToArray", addBookToArray);
+  ps.subs("delBookInArray", delBookInArray);
   ps.subs("changedReadStatus", changeReadStatus);
 })();
